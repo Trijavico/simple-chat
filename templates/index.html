@@ -21,7 +21,6 @@
   <h1 class="text-2xl text-center pt-4 px-4">Chat</h1>
 
   <div class="p-4 grid grid-rows-[1fr_min-content]" hx-ext="ws" ws-connect="/ws">
-
     <div class="relative">
       <ul class="h-full grid content-end pb-4" id="chat_room" >
       </ul>
@@ -29,7 +28,7 @@
 
     <form class="grid grid-cols-[1fr_min-content]" id="form" ws-send >
 
-      <input autofocus required id="input_text" name="text" type="text" 
+      <input  required id="input_text" name="text" type="text" 
       class="rounded bg-[#383A40] w-full border-2 border-gray-300 p-2" placeholder="Type your message">
 
       <button type="submit" class="rounded-r bg-[#B5BAC1] text-white px-4 py-2">Send</button>
