@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.10"
+    integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+    crossorigin="anonymous"></script>
+  <!-- HTMX Websockets extension https://htmx.org/extensions/web-sockets/ -->
+  <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realtime Chat</title>
+</head>
+
+<body class="bg-[#313338] relative min-h-screen grid grid-rows-[min-content_1fr]">
+
+  <h1 class="text-2xl text-center pt-4 px-4">Chat</h1>
+
+  <div class="p-4 grid grid-rows-[1fr_min-content]" hx-ext="ws" ws-connect="/ws">
+
+    <div class="relative">
+      <ul class="h-full grid content-end pb-4" id="chat_room" >
+      </ul>
+    </div>
+
+    <form class="grid grid-cols-[1fr_min-content]" id="form" ws-send >
+
+      <input autofocus required id="input_text" name="text" type="text" 
+      class="rounded bg-[#383A40] w-full border-2 border-gray-300 p-2" placeholder="Type your message">
+
+      <button type="submit" class="rounded-r bg-[#B5BAC1] text-white px-4 py-2">Send</button>
+
+    </form>
+
+  </div>
+</body>
+</html>
