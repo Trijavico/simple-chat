@@ -16,8 +16,15 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type UserReq struct {
+	Name string `json:"name"`
+}
+
 func main() {
+	hub := NewHub()
 	mux := http.NewServeMux()
+
+	go hub.Listen()
 
 	mux.Handle("/", http.FileServer(http.Dir("templates")))
 
@@ -47,11 +54,15 @@ func main() {
 			usrName.Name = "Default Name"
 		}
 
-		client := Client{
+		client := &Client{
 			ID:   uuid.NewString(),
 			Name: usrName.Name,
 			conn: conn,
+			hub:  hub,
+			send: make(chan []byte),
 		}
+
+		hub.register <- client
 
 		go client.readPump()
 		go client.responsePump()

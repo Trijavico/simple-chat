@@ -3,13 +3,10 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
-
-type UserReq struct {
-	Name string `json:"name"`
-}
 
 type Message struct {
 	ClientID   string
@@ -21,18 +18,38 @@ type Client struct {
 	ID   string
 	Name string
 	conn *websocket.Conn
+	hub  *Hub
 
 	send chan []byte
 }
 
+const (
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
+	maxMessageSize = 512
+)
+
 func (c *Client) readPump() {
+	defer func() {
+		c.hub.unregister <- c
+		c.conn.Close()
+	}()
+
+	c.conn.SetReadLimit(maxMessageSize)
+	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetPongHandler(func(string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
+
 	for {
 		_, req, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
-			continue
+			break
 		}
 
 		msg := &Message{}
@@ -43,12 +60,10 @@ func (c *Client) readPump() {
 			continue
 		}
 
-		msg_encoded, err := json.Marshal(msg)
-		if err != nil {
-			log.Printf("error: %v\n", err)
-		}
+		msg.ClientID = c.ID
+		msg.ClientName = c.Name
 
-		c.send <- msg_encoded
+		c.hub.broadcast <- msg
 
 	}
 }
