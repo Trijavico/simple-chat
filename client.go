@@ -15,7 +15,6 @@ type Message struct {
 }
 
 type Client struct {
-	ID   string
 	Name string
 	conn *websocket.Conn
 	hub  *Hub
@@ -60,7 +59,6 @@ func (c *Client) readPump() {
 			continue
 		}
 
-		msg.ClientID = c.ID
 		msg.ClientName = c.Name
 
 		c.hub.broadcast <- msg
